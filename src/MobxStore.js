@@ -35,19 +35,8 @@ class MobxStore {
     autorun(() => this.trainBatteryModel(this.calculatedColumns))
 
     // Only run 1 of these regression models, comment out the others
-    autorun(() =>
-      this.batteryLinearRegressor(
-        this.batteryNumFeatures,
-        this.batteryTensors,
-        this.batteryLearningRate,
-        this.batteryBatchSize,
-        this.batteryEpochCount,
-        this.batteryTrainingColumns
-      )
-    )
-
     // autorun(() =>
-    //   this.battery1HiddenRegressor(
+    //   this.batteryLinearRegressor(
     //     this.batteryNumFeatures,
     //     this.batteryTensors,
     //     this.batteryLearningRate,
@@ -56,6 +45,17 @@ class MobxStore {
     //     this.batteryTrainingColumns
     //   )
     // )
+
+    autorun(() =>
+      this.battery1HiddenRegressor(
+        this.batteryNumFeatures,
+        this.batteryTensors,
+        this.batteryLearningRate,
+        this.batteryBatchSize,
+        this.batteryEpochCount,
+        this.batteryTrainingColumns
+      )
+    )
 
     // autorun(() =>
     //   this.battery2HiddenRegressor(
@@ -195,7 +195,7 @@ class MobxStore {
    * I will likely want to async'ly do this for eveyr loaded HOMER file, so the
    * user can switch back and forth a between HOMER files and not have to retrain each time
    */
-  batteryEpochCount = 3
+  batteryEpochCount = 10
   batteryCurrentEpoch = 0
   batteryBatchSize = 40
   batteryLearningRate = 0.01
