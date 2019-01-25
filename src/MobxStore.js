@@ -195,7 +195,8 @@ class MobxStore {
    * I will likely want to async'ly do this for eveyr loaded HOMER file, so the
    * user can switch back and forth a between HOMER files and not have to retrain each time
    */
-  batteryEpochCount = 10
+  batteryEpochCount = 50
+  batteryModelStopLoss = 0.1
   batteryCurrentEpoch = 0
   batteryBatchSize = 40
   batteryLearningRate = 0.01
@@ -298,6 +299,7 @@ class MobxStore {
     epochCount,
     trainingColumns
   ) {
+    const t0 = performance.now()
     await this.batteryModelRun({
       model: multiLayerPerceptronRegressionModel1Hidden(numFeatures),
       tensors: tensors,
@@ -307,6 +309,12 @@ class MobxStore {
       epochCount,
       trainingColumns,
     })
+    const t1 = performance.now()
+    console.log(
+    'battery model training (1 hidden): ' + _.round((t1 - t0) / 1000) + ' seconds.',
+    `${this.batteryEpochCount} Epochs, `,
+    `~${_.round((t1 - t0) / 1000 / this.batteryEpochCount)} seconds/epoch`
+    )
   }
 
   async battery2HiddenRegressor(
@@ -361,6 +369,10 @@ class MobxStore {
           runInAction(() => {
             this.batteryCurrentEpoch = epoch
             this.batteryTrainLogs.push({ epoch, ...logs })
+            console.log('Epoch: ' + epoch + ', loss: ' + logs.loss + ', val_loss: ' + logs.val_loss)
+            if (logs.val_loss < this.batteryModelStopLoss) {
+              model.stopTraining = true              
+            }
           })
           if (weightsIllustration) {
             model.layers[0]

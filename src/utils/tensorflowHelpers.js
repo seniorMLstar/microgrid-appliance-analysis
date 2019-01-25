@@ -137,7 +137,7 @@ export function multiLayerPerceptronRegressionModel1Hidden(numFeatures) {
   model.add(
     tf.layers.dense({
       inputShape: [numFeatures],
-      units: 50,
+      units: 9,
       activation: 'sigmoid',
       kernelInitializer: 'leCunNormal',
     })
@@ -158,14 +158,14 @@ export function multiLayerPerceptronRegressionModel2Hidden(numFeatures) {
   model.add(
     tf.layers.dense({
       inputShape: [numFeatures],
-      units: 50,
+      units: 12,
       activation: 'sigmoid',
       kernelInitializer: 'leCunNormal',
     })
   )
   model.add(
     tf.layers.dense({
-      units: 50,
+      units: 12,
       activation: 'sigmoid',
       kernelInitializer: 'leCunNormal',
     })
@@ -220,9 +220,11 @@ export function calculatePlottablePredictedVsActualData(trainingData, model, inp
   const { trainFeatures, trainTarget } = trainingData
   const rawTrainFeatures = tf.tensor2d(trainFeatures)
   const { dataMean, dataStd } = determineMeanAndStddev(rawTrainFeatures)
-  const normalized_features = normalizeTensor(rawTrainFeatures, dataMean, dataStd)
+  const { testFeatures, testTarget } = trainingData
+  const rawTestFeatures = tf.tensor2d(testFeatures)
+  const normalized_features = normalizeTensor(rawTestFeatures, dataMean, dataStd)
   const normalized_predictions = model.predict(normalized_features).dataSync()
-  return _.map(trainTarget, (target, targetIndex) => {
+  return _.map(testTarget, (target, targetIndex) => {
     return { actual: target[0], predicted: normalized_predictions[targetIndex] }
   })
 }
